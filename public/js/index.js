@@ -2,7 +2,6 @@ var socket = io();
 
 socket.on('connect', function () {
   console.log('Connected to server.');
-
 });
 
 socket.on('disconnect', function () {
@@ -10,20 +9,14 @@ socket.on('disconnect', function () {
 });
 
 socket.on('newMessage', function (message) {
-  console.log('The message:', message);
-  var li = jQuery('<li></li>');
-  li.text(`${message.from}: ${message.text}`);
-  jQuery('#messages').append(li);
+  var msgtxt = Mustache.render(jQuery('#message-text-template').html(), {text : message.text});
+  jQuery('#messages').append(newMessageBody(message.from, message.createdAt, msgtxt));
 });
 
 socket.on('newLocationMessage', function (message) {
-  var li = jQuery('<li></li>');
-  var a = jQuery('<a target="_blank">My current location.</a>');
-  li.text(`${message.from}: `);
-  a.attr('href', message.url);
-  li.append(a);
-  jQuery('#messages').append(li);
-})
+  link = Mustache.render(jQuery('#message-location-template').html(), {url: message.url});
+  jQuery('#messages').append(newMessageBody(message.from, message.createdAt, link));
+});
 
 jQuery('#message-form').on('submit', function (event) {
   event.preventDefault(); // Don't refresh.
@@ -35,6 +28,14 @@ jQuery('#message-form').on('submit', function (event) {
     messageTxt.val('');
   });
 });
+
+var newMessageBody = function (from, timestamp, messageHtml) {
+  return Mustache.render(jQuery('#message-template').html(), {
+    from,
+    createdAt: moment(timestamp).format("h:mm A"),
+    messageHtml
+  });
+}
 
 var locationButton = jQuery('#send-location')
 locationButton.on('click', function () {
