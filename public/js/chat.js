@@ -1,7 +1,16 @@
 var socket = io();
 
 socket.on('connect', function () {
-  console.log('Connected to server.');
+  var params = jQuery.deparam(window.location.search);
+  params.name = params['?name'];
+  socket.emit('join', params, function (error) {
+    if (error) {
+      alert(error);
+      window.location.href = '/';
+    } else {
+      console.log('User entered room.')
+    }
+  });
 });
 
 socket.on('disconnect', function () {
@@ -18,11 +27,17 @@ socket.on('newLocationMessage', function (message) {
   postNewMessage(newMessageBody(message.from, message.createdAt, link));
 });
 
+socket.on('updateActiveUsers', function (userlist) {
+  var ol = jQuery('#active-users').empty();
+  userlist.forEach(function (user) {
+    ol.append(jQuery('<li></li>').text(user));
+  });
+});
+
 jQuery('#message-form').on('submit', function (event) {
   event.preventDefault(); // Don't refresh.
   var messageTxt = jQuery('[name=message]');
   socket.emit('createMessage', {
-    from: 'Anonymous',
     text: messageTxt.val()
   }, function () {
     messageTxt.val('');
@@ -43,9 +58,11 @@ var distanceToBottom = function () {
 }
 
 var scrollToBottom = function () {
-  var newMsgHeight = jQuery('#messages').children('li:last-child').innerHeight();
-  if (distanceToBottom() === newMsgHeight) {
-    console.log('Scroll!!');
+  var messages = jQuery('#messages');
+  var newMsgHeight = messages.children('li:last-child').innerHeight();
+  var distToBottom = distanceToBottom();
+  if (distToBottom >= newMsgHeight) {
+    messages.scrollTop(messages.prop('scrollHeight'));
   }
 };
 
