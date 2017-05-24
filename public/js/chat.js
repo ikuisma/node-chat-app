@@ -1,16 +1,7 @@
 var socket = io();
 
 socket.on('connect', function () {
-  var params = jQuery.deparam(window.location.search);
-  params.name = params['?name'];
-  socket.emit('join', params, function (error) {
-    if (error) {
-      alert(error);
-      window.location.href = '/';
-    } else {
-      console.log('User entered room.')
-    }
-  });
+  socket.emit('join');
 });
 
 socket.on('disconnect', function () {
@@ -32,6 +23,10 @@ socket.on('updateActiveUsers', function (userlist) {
   userlist.forEach(function (user) {
     ol.append(jQuery('<li></li>').text(user));
   });
+});
+
+socket.on('redirect', (newURL) => {
+  window.location.href = newURL;
 });
 
 jQuery('#message-form').on('submit', function (event) {
@@ -74,7 +69,7 @@ var newMessageBody = function (from, timestamp, messageHtml) {
   });
 };
 
-var locationButton = jQuery('#send-location')
+var locationButton = jQuery('#send-location');
 locationButton.on('click', function () {
   if (!navigator.geolocation) {
     return alert('Geolocation not supported by your browser.');

@@ -14,6 +14,10 @@ class Users {
     return user;
   };
 
+  getUsers() {
+    return this.users;
+  };
+
   removeUser(id) {
     var idx = this.users.findIndex((user) => user.id == id);
     if (idx === -1) {
@@ -27,11 +31,14 @@ class Users {
     return this.users.filter((user) => user.id === id)[0];
   };
 
+  userWithName(name) {
+    return this.users.filter((user) => user.name === name)[0];
+  };
+
   getUserList(room) {
     var objs = this.users.filter((user) => user.room === room);
     return objs.map((obj) => obj['name']);
   };
-
 };
 
 module.exports = {Users};

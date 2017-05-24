@@ -2,64 +2,129 @@
 const path = require('path');
 const http = require('http');
 const express = require('express');
+const url = require('url');
 const socketIO = require('socket.io');
+const bodyParser = require('body-parser');
+const sharedsession = require('express-socket.io-session');
+const cookieParser = require('cookie-parser');
+const hbs = require('hbs');
+const _ = require('lodash');
 
 const {generateMessage, generateLocationMessage} = require('./utils/message');
 const {isRealString} = require('./utils/validation');
 const {Users} = require('./utils/users');
 
 const port = process.env.PORT || 3000;
+const session_secret = "as3i42h4hj42jho";
+
 const publicPath = path.join(__dirname, '../public');
+const users = new Users();
+
+const session = require('express-session')({
+  resave: true,
+  saveUninitialized: true,
+  secret: session_secret,
+  cookie: { secure: false }
+});
 
 var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
-const users = new Users();
 
-app.use(express.static(publicPath));
+app.set('view engine', 'hbs');
+app.use(session);
+app.use(cookieParser(session_secret));
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
+app.use(express.static(publicPath, {
+  index: false
+}));
+
+app.use((req, res, next) => {
+  if (users.getUser(req.sessionID) && (req.url != '/chat')) {
+    res.redirect('/chat');
+  }
+  next();
+});
+
+io.use(sharedsession(session, cookieParser(session_secret), {
+  autoSave: true
+}));
+
+app.get('/', (req, res) => {
+  res.render('index.hbs');
+});
+
+app.get('/chat', (req, res) => {
+  user = users.getUser(req.sessionID);
+  if (user) {
+    res.render('chat.hbs');
+  } else {
+    res.render('index.hbs', {
+      errormessages: ['Session not found.']
+    });
+  }
+});
+
+app.post('/login', (req, res) => {
+  body = req.body;
+  if (users.userWithName(body.name.trim())) {
+    res.render('index.hbs', {
+      errormessages: ['Username already taken!']
+    });
+  } else {
+    users.addUser(req.sessionID, body.name, body.room);
+    res.redirect('/chat');
+  };
+});
+
+app.all('*', (req, res) => {
+  res.redirect('/');
+});
+
+io.use((socket, next) => {
+  socket.handshake.sid = socket.handshake.signedCookies['connect.sid'];
+  next();
+});
 
 io.on('connection', (socket) => {
-  console.log('New user connected.');
 
-  socket.on('join', (params, callback) => {
-    if (! isRealString(params.name) || !isRealString(params.room)) {
-      return callback('Name and room name are required.');
-    } else{
-      var room = params.room;
+  socket.on('join', () => {
+    var user = users.getUser(socket.handshake.sid);
+    if (user) {
+      var room = user.room;
       socket.join(room);
-      users.removeUser(socket.id);
-      users.addUser(socket.id, params.name, room);
-      msg = `${params.name} has entered the room.`;
+      msg = `${user.name} has entered the room.`;
       socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat!'));
       io.to(room).emit('updateActiveUsers', users.getUserList(room));
-      socket.broadcast.to(room).emit('newMessage', generateMessage('Admin', msg));
-      callback();
+      socket.to(room).broadcast.emit('newMessage', generateMessage('Admin', msg));
+    } else {
     }
   });
 
   socket.on('createMessage', (message, acknowledge) => {
-      user = users.getUser(socket.id);
-      if (user && isRealString(message.text)) {
-        io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+      user = users.getUser(socket.handshake.sid);
+      if (!user) {
         acknowledge();
+        socket.emit('redirect', '/');
+      } else if (isRealString(message.text)) {
+        acknowledge();
+        io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
       } else {
-        console.error();
       }
   });
 
-  socket.on('createLocationMessage', (coords) => {
-    user = users.getUser(socket.id);
-    if (user) {
-      io.emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
-    }
-  });
-
   socket.on('disconnect', () => {
-    user = users.removeUser(socket.id);
+    var id = socket.handshake.sid;
+    var user = users.getUser(id);
     if (user) {
-      var msg = `${user.name} has left the building.`;
-      io.to(user.room).emit('newMessage', generateMessage('Admin', msg));
-      io.to(user.room).emit('updateActiveUsers', users.getUserList(user.room));
+      var room = user.room;
+      users.removeUser(id);
+      console.log(users.getUsers());
+      socket.to(room).emit('updateActiveUsers', users.getUserList(user.room));
     }
   });
 });
