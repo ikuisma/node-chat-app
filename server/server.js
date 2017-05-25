@@ -62,7 +62,9 @@ app.get('/', (req, res) => {
 app.get('/chat', (req, res) => {
   user = users.getUser(req.sessionID);
   if (user) {
-    res.render('chat.hbs');
+    res.render('chat.hbs', {
+      room: user.room
+    });
   } else {
     res.render('index.hbs', {
       errormessages: ['Session not found.']
@@ -79,7 +81,7 @@ app.post('/login', (req, res) => {
     return;
   } else {
     users.addUser(req.sessionID, body.name, body.room);
-    res.render('chat.hbs');
+    res.redirect('/chat');
     return;
   };
 });
