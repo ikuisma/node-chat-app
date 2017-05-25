@@ -46,8 +46,9 @@ app.use(express.static(publicPath, {
 app.use((req, res, next) => {
   if (users.getUser(req.sessionID) && (req.url != '/chat')) {
     res.redirect('/chat');
+  } else {
+    next();
   }
-  next();
 });
 
 io.use(sharedsession(session, cookieParser(session_secret), {
@@ -75,9 +76,11 @@ app.post('/login', (req, res) => {
     res.render('index.hbs', {
       errormessages: ['Username already taken!']
     });
+    return;
   } else {
     users.addUser(req.sessionID, body.name, body.room);
-    res.redirect('/chat');
+    res.render('chat.hbs');
+    return;
   };
 });
 
@@ -123,8 +126,9 @@ io.on('connection', (socket) => {
     if (user) {
       var room = user.room;
       users.removeUser(id);
-      console.log(users.getUsers());
       socket.to(room).emit('updateActiveUsers', users.getUserList(user.room));
+      msg = `${user.name} has left the room.`;
+      socket.to(room).emit('newMessage', generateMessage('Admin', msg));
     }
   });
 });
