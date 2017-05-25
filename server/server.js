@@ -122,6 +122,13 @@ io.on('connection', (socket) => {
       }
   });
 
+  socket.on('createLocationMessage', (coords) => {
+    user = users.getUser(socket.handshake.sid);
+    if (user) {
+      io.emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
+    }
+  });
+
   socket.on('disconnect', () => {
     var id = socket.handshake.sid;
     var user = users.getUser(id);

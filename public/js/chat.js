@@ -14,7 +14,7 @@ socket.on('newMessage', function (message) {
 });
 
 socket.on('newLocationMessage', function (message) {
-  link = Mustache.render(jQuery('#message-location-template').html(), {url: message.url});
+  var link = Mustache.render(jQuery('#message-location-template').html(), {url: message.url});
   postNewMessage(newMessageBody(message.from, message.createdAt, link));
 });
 
@@ -82,6 +82,8 @@ locationButton.on('click', function () {
       });
       locationButton.removeAttr('disabled').text('Send location');
     }, function (error) {
-      alert('Unable to fetch location')
+      alert('Unable to fetch location. Please check that you have enabled location services.');
+      console.log(error);
+      locationButton.removeAttr('disabled').text('Send location');
     });
 });
