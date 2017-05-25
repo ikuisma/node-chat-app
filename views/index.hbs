@@ -4,34 +4,57 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <title> Chat | Join </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/js/libs/jquery-3.2.1.min.js"></script>
   </head>
   <body class="centered-form">
-    <div class="centered-form__form" style="text-align:center;">
-      <form id="myform" method="POST" action="/login">
-        <div class="form-field">
-          <h3>Join.</h3>
-        </div>
-        {{#if errormessages}}
-          <div class="form-field">
-            {{#each errormessages}}
-              <label><font color="red"> {{this}} </font></label>
-            {{/each}}
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-5 flex-first centered-form__form row-eq-height">
+              <div style="text-align:center;">
+                <div class="form-field">
+                  <h3>Available rooms.</h3>
+                </div>
+                <div class="form-field" style="overflow-y:scroll; height:185px;">
+                  {{#if rooms}}
+                    <ul class="list-group">
+                    {{#each rooms}}
+                      <li class="list-group-item">{{this}}</li>
+                    {{/each}}
+                    </ul>
+                  {{/if}}
+                </div>
+              </div>
           </div>
-        {{/if}}
-        <div class="form-field">
-          <label>Display name</label>
-          <input type="text" name="name" autofocus/>
-        </div>
-        <div class="form-field">
-          <label>Room name</label>
-          <input type="text" name="room"/>
-        </div>
-        <div class="form-field">
-          <button>Join!</button>
-        </div>
-      </form>
+          <div class="col-md-6 flex-last centered-form__form row-eq-height">
+              <div class="row-eq-height" style="text-align:center;">
+                  <form id="myform" method="POST" action="/login">
+                    <div class="form-field">
+                      <h3>Join.</h3>
+                    </div>
+                    {{#if errormessages}}
+                      <div class="form-field">
+                        {{#each errormessages}}
+                          <label><font color="red"> {{this}} </font></label>
+                        {{/each}}
+                      </div>
+                    {{/if}}
+                    <div class="form-field">
+                      <label>Display name</label>
+                      <input type="text" name="name" autofocus/>
+                    </div>
+                    <div class="form-field">
+                      <label>Room name</label>
+                      <input type="text" name="room"/>
+                    </div>
+                    <div class="form-field">
+                      <button>Join!</button>
+                    </div>
+                </form>
+              </div>
+          </div>
+      </div>
     </div>
   </body>
 </html>

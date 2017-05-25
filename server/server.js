@@ -56,7 +56,10 @@ io.use(sharedsession(session, cookieParser(session_secret), {
 }));
 
 app.get('/', (req, res) => {
-  res.render('index.hbs');
+  console.log(users.allRooms());
+  res.render('index.hbs', {
+    rooms: users.allRooms()
+  });
 });
 
 app.get('/chat', (req, res) => {
@@ -76,7 +79,8 @@ app.post('/login', (req, res) => {
   body = req.body;
   if (users.userWithName(body.name.trim())) {
     res.render('index.hbs', {
-      errormessages: ['Username already taken!']
+      errormessages: ['Username already taken!'],
+      rooms: users.allRooms()
     });
     return;
   } else {

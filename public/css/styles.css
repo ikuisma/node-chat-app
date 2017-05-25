@@ -45,6 +45,14 @@ button:disabled {
     background: #698ea5
 }
 
+.rooms-list {
+  float: left;
+}
+
+.login-form {
+  float: right;
+}
+
 .centered-form {
     display: flex;
     align-items: center;
@@ -80,6 +88,7 @@ button:disabled {
     display: block;
     margin-bottom: 7px
 }
+
 
 .form-field input,
 .form-field select {

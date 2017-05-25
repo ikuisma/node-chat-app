@@ -61,4 +61,9 @@ describe('Users', () => {
     expect(users.getUser('123').name).toBe('abc');
   });
 
+  it('should return all rooms', () => {
+    var rooms = users.allRooms();
+    expect(rooms.length).toBe(2);
+  });
+
 });

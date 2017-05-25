@@ -27,6 +27,10 @@ class Users {
     }
   };
 
+  allRooms() {
+    return Array.from(new Set(this.users.map((user) => user.room)));
+  };
+
   getUser (id) {
     return this.users.filter((user) => user.id === id)[0];
   };
