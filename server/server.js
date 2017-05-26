@@ -56,7 +56,6 @@ io.use(sharedsession(session, cookieParser(session_secret), {
 }));
 
 app.get('/', (req, res) => {
-  console.log(users.allRooms());
   res.render('index.hbs', {
     rooms: users.allRooms()
   });
