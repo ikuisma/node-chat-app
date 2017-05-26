@@ -9,8 +9,9 @@ socket.on('disconnect', function () {
 });
 
 socket.on('newMessage', function (message) {
-  var msgtxt = Mustache.render(jQuery('#message-text-template').html(), {text : message.text});
-  postNewMessage(newMessageBody(message.from, message.createdAt, msgtxt));
+  var msg = markdown.toHTML(message.text);
+  var msghtml = Mustache.render(jQuery('#message-text-template').html(), {text : msg});
+  postNewMessage(newMessageBody(message.from, message.createdAt, msghtml));
 });
 
 socket.on('newLocationMessage', function (message) {
