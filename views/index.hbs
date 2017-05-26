@@ -20,7 +20,7 @@
                   {{#if rooms}}
                     <ul class="list-group">
                     {{#each rooms}}
-                      <li class="list-group-item">{{this}}</li>
+                      <li class="list-group-item" onclick="setRoom(this);">{{this}}</li>
                     {{/each}}
                     </ul>
                   {{/if}}
@@ -56,5 +56,6 @@
           </div>
       </div>
     </div>
+    <script src="/js/index.js"></script>
   </body>
 </html>

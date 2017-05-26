@@ -69,7 +69,8 @@ app.get('/chat', (req, res) => {
     });
   } else {
     res.render('index.hbs', {
-      errormessages: ['Session not found.']
+      errormessages: ['Session not found.'],
+      rooms: users.allRooms()
     });
   }
 });
