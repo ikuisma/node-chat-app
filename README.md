@@ -10,11 +10,11 @@ You will need to have [Node.js](https://nodejs.org/en/) installed on your machin
 
 ### Installing
 
-Clone this repository to your local machine, navigate to the root directory and execute `npm install` from the command line. All the required modules will be downloaded. You can start the application by executing `node server/server.js` from the root directory. The application will be hosted at localhost:3000/ on your machine. 
+Clone this repository to your local machine, navigate to the root directory and execute `npm install` from the command line. All the required modules will be downloaded. You can start the application by executing `node server/server.js` from the root directory. The application will be available at localhost:3000/ on your machine. 
 
 ## Running the tests
 
-The tests use the Mocha framework which is included in the package. In order to run the tests, simply execute `npm test` frmo the command line at the root directory of the project. 
+The tests use the Mocha framework which is included in the package. In order to run the tests, simply execute `npm test` from the command line at the root directory of the project. 
 
 ## Deployment
 
