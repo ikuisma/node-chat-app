@@ -83,7 +83,13 @@ app.post('/login', (req, res) => {
       rooms: users.allRooms()
     });
     return;
-  } else {
+  } else if (body.room.trim() === ''){
+    res.render('index.hbs', {
+      errormessages: ["Room name can't be empty!"],
+      rooms: users.allRooms()
+    });
+    return;
+  }else {
     users.addUser(req.sessionID, body.name, body.room);
     res.redirect('/chat');
     return;
